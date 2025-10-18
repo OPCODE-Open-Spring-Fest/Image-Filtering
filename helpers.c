@@ -1,4 +1,4 @@
-#include "helper.h"
+#include "helpers.h"
 
 
 void grayscale(int height, int width, RGBTRIPLE image[height][width]){
