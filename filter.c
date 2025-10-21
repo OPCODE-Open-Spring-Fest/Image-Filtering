@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsi";
+    char *filters = "bgrsiv";
 
     
     char filterArr[argc-3];
@@ -120,10 +120,13 @@ int main(int argc, char *argv[])
         case 's':
             sepia(height, width, image);
             break;
-
         //invert
         case 'i':
             invert(height,width,image);
+            break;
+        // Vignette
+        case 'v':
+            vignette(height, width, image);
             break;
         default:
             printf("%c", &filterArr[i]);

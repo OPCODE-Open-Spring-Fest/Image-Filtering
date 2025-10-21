@@ -14,3 +14,5 @@ void reflect(int height, int width, RGBTRIPLE image[height][width]);
 
 // Blur image
 void blur(int height, int width, RGBTRIPLE image[height][width]);
+//
+void vignette(int height, int width, RGBTRIPLE image[height][width]);
