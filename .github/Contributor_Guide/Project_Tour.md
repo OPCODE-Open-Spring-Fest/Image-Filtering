@@ -14,19 +14,19 @@ Why are these structs useful? Well, recall that a file is just a sequence of byt
 
 
 ### filter.c
-
 Now, let’s open up filter.c. This file has been written already for you, but there are a couple important points worth noting here.
 
 First, notice the definition of filters on line 10. That string tells the program what the allowable command-line arguments to the program are: b, g, r, and s. Each of them specifies a different filter that we might apply to our images: blur, grayscale, reflection, and sepia.
 
+Then, lines 11 to 32 run a check for flags and validates them while storing them up in an array for sequentially applying them.
+
 The next several lines open up an image file, make sure it’s indeed a BMP file, and read all of the pixel information into a 2D array called image.
 
-Scroll down to the switch statement that begins on line 101. Notice that, depending on what filter we’ve chosen, a different function is called: if the user chooses filter b, the program calls the blur function; if g, then grayscale is called; if r, then reflect is called; and if s, then sepia is called. Notice, too, that each of these functions take as arguments the height of the image, the width of the image, and the 2D array of pixels.
+Scroll down to the for loop on switch statement that begins on line 101. Notice that, depending on what filter flags you've passed in sequence , a different function is called: if the user chooses filter b, the program calls the blur function; if g, then grayscale is called; if r, then reflect is called; and if s, then sepia is called. Notice, too, that each of these functions take as arguments the height of the image, the width of the image, and the 2D array of pixels. After each execution of filter function, loop moves onto next filter in array to apply, if present.
 
 These are the functions you’ll (soon!) implement. As you might imagine, the goal is for each of these functions to edit the 2D array of pixels in such a way that the desired filter is applied to the image.
 
 The remaining lines of the program take the resulting image and write them out to a new image file.
-
 
 ### Helpers.h
 
@@ -63,3 +63,6 @@ Paste This in you Terminal(without quotes)
 4. For sepia:
 
        "filter -s in.bmp out.bmp" 
+5. To run multiple filters:
+
+       "filter -g -s -i in.bmp out.bmp"
