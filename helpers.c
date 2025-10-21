@@ -1,5 +1,7 @@
 #include "helpers.h"
-
+#include <stdint.h>
+#include <stdlib.h>
+#include "bmp.h"
 int min(int a,int b){
     if(a<b) return a;
     return b;
@@ -83,7 +85,44 @@ void reflect(int height, int width, RGBTRIPLE image[height][width]){
 
 
 void blur(int height, int width, RGBTRIPLE image[height][width]){
+    // Allocate temporary array on heap
+    RGBTRIPLE **temp = malloc(height * sizeof(RGBTRIPLE *));
+    for (int i = 0; i < height; i++)
+        temp[i] = malloc(width * sizeof(RGBTRIPLE));
 
-// Blur image
-
+    int kernelSize = 21;  // large kernel for heavy blur
+    int offset = kernelSize / 2;
+    // Repeating blur 2-3 times for ultra blur effect 
+    //because in single time effect not much visible
+    for(int repeat = 0; repeat < 3; repeat++){
+        for(int i = 0; i < height; i++){
+            for (int j = 0; j < width; j++){
+                int sumRed = 0, sumGreen = 0, sumBlue = 0;
+                int count = 0;
+                for (int ki = -offset; ki <= offset; ki++){
+                    for(int kj = -offset; kj <= offset; kj++){
+                        int ni = i + ki;
+                        int nj = j + kj;
+                        if(ni >= 0 && ni < height && nj >= 0 && nj < width){
+                            sumRed += image[ni][nj].rgbtRed;
+                            sumGreen += image[ni][nj].rgbtGreen;
+                            sumBlue += image[ni][nj].rgbtBlue;
+                            count++;
+                        }
+                    }
+                }
+                temp[i][j].rgbtRed = (uint8_t)(sumRed / count);
+                temp[i][j].rgbtGreen = (uint8_t)(sumGreen / count);
+                temp[i][j].rgbtBlue = (uint8_t)(sumBlue / count);
+            }
+        }
+        // Copy blurred array back to orig
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
+                image[i][j] = temp[i][j];
+    }
+    for (int i = 0; i < height; i++)
+        free(temp[i]);
+    free(temp);
 }
+
