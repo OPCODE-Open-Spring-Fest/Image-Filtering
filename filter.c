@@ -9,23 +9,23 @@ int main(int argc, char *argv[])
     // Define allowable filters
     char *filters = "bgrsi";
 
-    // Get filter flag and check validity
-    char filter = getopt(argc, argv, filters);
-    if (filter == '?')
-    {
-        printf("Invalid filter.\n");
-        return 1;
+    
+    char filterArr[argc-3];
+    
+    // gets all filter flags and checks validity
+    for(int i=0; i<argc; i++){
+        char temp = getopt(argc,argv,filters);
+        if(temp == -1) break;
+        filterArr[i]= temp;
+        if(filterArr[i] == '?') {
+            printf("Invalid filter option");
+            return 1;
+        }
     }
-
-    // Ensure only one filter
-    if (getopt(argc, argv, filters) != -1)
-    {
-        printf("Only one filter allowed.\n");
-        return 2;
-    }
+    
 
     // Ensure proper usage
-    if (argc != optind + 2)
+    if (argc < optind + 2)
     {
         printf("Usage: ./filter [flag] infile outfile\n");
         return 3;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     // Ensure infile is (likely) a 24-bit uncompressed BMP 4.0
     if (bf.bfType != 0x4d42 || bf.bfOffBits != 54 || bi.biSize != 40 ||
         bi.biBitCount != 24 || bi.biCompression != 0)
-    {
+    {   
         fclose(outptr);
         fclose(inptr);
         printf("Unsupported file format.\n");
@@ -98,7 +98,8 @@ int main(int argc, char *argv[])
     }
 
     // Filter image
-    switch (filter)
+    for(int i=0; i<argc-3; i++){
+    switch (filterArr[i])
     {
         // Blur
         case 'b':
@@ -124,9 +125,12 @@ int main(int argc, char *argv[])
         case 'i':
             invert(height,width,image);
             break;
+        default:
+            printf("%c", &filterArr[i]);
+            break;
         
     }
-
+    }
     // Write outfile's BITMAPFILEHEADER
     fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
 
