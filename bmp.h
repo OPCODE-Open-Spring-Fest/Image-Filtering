@@ -1,57 +1,52 @@
-// BMP-related data types based on Microsoft's own
+// bmp.h
+// Cross-platform BMP header definitions (CS50-style)
+
+#ifndef BMP_H
+#define BMP_H
 
 #include <stdint.h>
 
-// These data types are essentially aliases for C/C++ primitive data types.
-// Adapted from http://msdn.microsoft.com/en-us/library/cc230309.aspx.
-// See https://en.wikipedia.org/wiki/C_data_types#stdint.h for more on stdint.h.
+// Use 1-byte alignment across all compilers
+#ifdef _MSC_VER
+#pragma pack(push, 1)
+#else
+#pragma pack(push, 1)
+#endif
 
-typedef uint8_t  BYTE;
-typedef uint32_t DWORD;
-typedef int32_t  LONG;
-typedef uint16_t WORD;
-
-// The BITMAPFILEHEADER structure contains information about the type, size,
-// and layout of a file that contains a DIB [device-independent bitmap].
-// Adapted from http://msdn.microsoft.com/en-us/library/dd183374(VS.85).aspx.
-
+// --- Bitmap File Header (14 bytes) ---
 typedef struct
 {
-    WORD   bfType;
-    DWORD  bfSize;
-    WORD   bfReserved1;
-    WORD   bfReserved2;
-    DWORD  bfOffBits;
-} __attribute__((__packed__))
-BITMAPFILEHEADER;
+    uint16_t bfType;         // File type ("BM")
+    uint32_t bfSize;         // Size of the file in bytes
+    uint16_t bfReserved1;    // Reserved; must be 0
+    uint16_t bfReserved2;    // Reserved; must be 0
+    uint32_t bfOffBits;      // Offset to start of pixel data
+} BITMAPFILEHEADER;
 
-// The BITMAPINFOHEADER structure contains information about the
-// dimensions and color format of a DIB [device-independent bitmap].
-// Adapted from http://msdn.microsoft.com/en-us/library/dd183376(VS.85).aspx.
-
+// --- Bitmap Info Header (40 bytes for BITMAPINFOHEADER) ---
 typedef struct
 {
-    DWORD  biSize;
-    LONG   biWidth;
-    LONG   biHeight;
-    WORD   biPlanes;
-    WORD   biBitCount;
-    DWORD  biCompression;
-    DWORD  biSizeImage;
-    LONG   biXPelsPerMeter;
-    LONG   biYPelsPerMeter;
-    DWORD  biClrUsed;
-    DWORD  biClrImportant;
-} __attribute__((__packed__))
-BITMAPINFOHEADER;
+    uint32_t biSize;            // Header size (40 bytes)
+    int32_t  biWidth;           // Image width in pixels
+    int32_t  biHeight;          // Image height in pixels
+    uint16_t biPlanes;          // Number of color planes (1)
+    uint16_t biBitCount;        // Bits per pixel (24 for RGB)
+    uint32_t biCompression;     // Compression type (0 = none)
+    uint32_t biSizeImage;       // Image size (may be 0 if uncompressed)
+    int32_t  biXPelsPerMeter;   // Horizontal resolution (pixels/meter)
+    int32_t  biYPelsPerMeter;   // Vertical resolution (pixels/meter)
+    uint32_t biClrUsed;         // Number of colors used
+    uint32_t biClrImportant;    // Number of important colors
+} BITMAPINFOHEADER;
 
-// The RGBTRIPLE structure describes a color consisting of relative intensities of
-// red, green, and blue. Adapted from http://msdn.microsoft.com/en-us/library/aa922590.aspx.
-
+// --- RGB Triple (3 bytes per pixel) ---
 typedef struct
 {
-    BYTE  rgbtBlue;
-    BYTE  rgbtGreen;
-    BYTE  rgbtRed;
-} __attribute__((__packed__))
-RGBTRIPLE;
+    uint8_t rgbtBlue;
+    uint8_t rgbtGreen;
+    uint8_t rgbtRed;
+} RGBTRIPLE;
+
+#pragma pack(pop)
+
+#endif // BMP_H
