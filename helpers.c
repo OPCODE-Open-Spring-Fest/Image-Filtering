@@ -270,6 +270,59 @@ void detect_edges(int height, int width, RGBTRIPLE image[height][width])
         }
     }
 
+
+
+// Pixelate Filter
+void apply_pixelate(int height, int width, RGBTRIPLE image[height][width], int blockSize)
+{
+    for (int i = 0; i < height; i += blockSize)
+    {
+        for (int j = 0; j < width; j += blockSize)
+        {
+            int sumRed = 0, sumGreen = 0, sumBlue = 0;
+            int count = 0;
+
+            // Compute average color in the block
+            for (int bi = 0; bi < blockSize; bi++)
+            {
+                for (int bj = 0; bj < blockSize; bj++)
+                {
+                    int ni = i + bi;
+                    int nj = j + bj;
+                    if (ni < height && nj < width)
+                    {
+                        sumRed += image[ni][nj].rgbtRed;
+                        sumGreen += image[ni][nj].rgbtGreen;
+                        sumBlue += image[ni][nj].rgbtBlue;
+                        count++;
+                    }
+                }
+            }
+
+            int avgRed = sumRed / count;
+            int avgGreen = sumGreen / count;
+            int avgBlue = sumBlue / count;
+
+            // Set all pixels in the block to the average color
+            for (int bi = 0; bi < blockSize; bi++)
+            {
+                for (int bj = 0; bj < blockSize; bj++)
+                {
+                    int ni = i + bi;
+                    int nj = j + bj;
+                    if (ni < height && nj < width)
+                    {
+                        image[ni][nj].rgbtRed = avgRed;
+                        image[ni][nj].rgbtGreen = avgGreen;
+                        image[ni][nj].rgbtBlue = avgBlue;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
     // Free temporary array
     for (int i = 0; i < height; i++)
         free(copy[i]);

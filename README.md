@@ -181,6 +181,21 @@ Gx
 
 The result is clamped between 0 and 255 and replaces the original pixel value. This produces a monochrome image where edges are highlighted, giving a pencil-sketch effect.
 
+
+
+### Pixelate Filter
+
+The “Pixelate” filter divides the image into small square blocks (default 5x5) and replaces each block with the average color of its pixels. This creates a mosaic-like effect, useful for artistic rendering or obscuring parts of an image for privacy.
+
+Algorithm Steps:
+
+1. Divide the image into blocks of size blockSize x blockSize.
+2. For each block:
+   a. Compute the average Red, Green, and Blue values of all pixels in the block.
+   b. Replace all pixels in the block with the computed average color.
+3. Repeat until all blocks are processed.
+
+
 ---
 
 ### Usage

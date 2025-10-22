@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtd";
+    char *filters = "bgrsivtdp";
 
    
 
@@ -132,6 +132,12 @@ while ((opt = getopt(argc, argv, filters)) != -1)
 
             case 'd':  // Edge Detection
     detect_edges(height, width, image);
+    break;
+
+
+
+    case 'p':
+    apply_pixelate(height, width, image, 5); // default block size = 5
     break;
 
       default:
