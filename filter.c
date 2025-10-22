@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsi";
+    char *filters = "bgrsit";
 
     
     char filterArr[argc-3];
@@ -124,6 +124,11 @@ int main(int argc, char *argv[])
         //invert
         case 'i':
             invert(height,width,image);
+            break;
+
+        // Threshold (black & white)
+        case 't':
+            threshold(height, width, image);
             break;
         default:
             printf("%c", &filterArr[i]);
