@@ -7,20 +7,20 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsitB";
+    char *filters = "bgrsivB:";
 
     
     char filterArr[argc-3];
+    int filterCount = 0;
     
     // gets all filter flags and checks validity
-    for(int i=0; i<argc; i++){
-        char temp = getopt(argc,argv,filters);
-        if(temp == -1) break;
-        filterArr[i]= temp;
-        if(filterArr[i] == '?') {
-            printf("Invalid filter option");
+    int opt;
+    while ((opt = getopt(argc, argv, filters)) != -1) {
+        if (opt == '?') {
+            printf("Invalid filter option\n");
             return 1;
         }
+        filterArr[filterCount++] = opt;
     }
     
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     }
 
     // Filter image
-    for(int i=0; i<argc-3; i++){
+    for(int i=0; i<filterCount; i++){
     switch (filterArr[i])
     {
         // Blur
@@ -126,27 +126,19 @@ int main(int argc, char *argv[])
             invert(height,width,image);
             break;
 
-        // Threshold (black & white)
-        case 't':
-            threshold(height, width, image);
+        // Vignette
+        case 'v':
+            vignette(height, width, image);
             break;
 
         // Brightness Adjust
         case 'B': {
-            int brightness_value = 0;
-            // Get brightness value from argv, after -B flag (assume it appears as -B val)
-            if (optind < argc) {
-                brightness_value = atoi(argv[optind]);
-                optind++;
-            } else {
-                printf("Missing value for -B (brightness) flag.\n");
-                return 8;
-            }
+            int brightness_value = atoi(optarg);
             brightness(height, width, image, brightness_value);
             break;
         }
         default:
-            printf("%c", &filterArr[i]);
+            printf("Unknown filter: %c\n", filterArr[i]);
             break;
         
     }
