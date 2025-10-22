@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
         case 's':
             sepia(height, width, image);
             break;
-
         //invert
         case 'i':
             invert(height,width,image);
