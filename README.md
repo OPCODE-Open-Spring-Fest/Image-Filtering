@@ -128,6 +128,22 @@ The vignette filter gives an image a cinematic look by gradually darkening its c
 
 If you apply this algorithm, your resulting image will have gently darkened corners and an undisturbed/sunnier center.
 
+### 6.) The Threshold Algorithm
+
+The “threshold” filter converts a colorful image into a pure black-and-white one based on pixel intensity.
+
+For each pixel, the intensity is calculated as the average of its red, green, and blue values:
+
+\[
+\text{intensity} = \frac{(R + G + B)}{3}
+\]
+
+If the intensity is **greater than or equal to 128**, the pixel is set to **white** (`R = G = B = 255`).
+Otherwise, it is set to **black** (`R = G = B = 0`).
+
+This results in a high-contrast, two-tone image where all intermediate shades are eliminated — essentially a hard binary “black-and-white” conversion.
+
+
 ---
 
 ### Usage

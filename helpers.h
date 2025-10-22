@@ -16,3 +16,6 @@ void reflect(int height, int width, RGBTRIPLE image[height][width]);
 void blur(int height, int width, RGBTRIPLE image[height][width]);
 // Vignette image
 void vignette(int height, int width, RGBTRIPLE image[height][width]);
+
+//Threshold Filter(Black & White)
+void threshold(int height, int width, RGBTRIPLE image[height][width]);
