@@ -122,13 +122,23 @@ If you apply the above algorithm to each pixel in the image, the result should l
 ./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
 ```
 
-### 7.) Vignette Filter
-- **Flag:** `-v`
-- **Description:** Applies a vignette effect that darkens the corners of the image to focus attention towards the center.
-- **Usage example:**
-```sh
-./filter -v input.bmp output.bmp
+---
+
+### Usage
+
+To apply a filter via command-line:
+- `g`: grayscale
+- `s`: sepia
+- `r`: reflect
+- `b`: blur
+- `i`: invert
+- `v`: vignette
+
+For vignette:
 ```
+./filter v input.bmp output.bmp
+```
+You can also chain multiple filters by supplying multiple tags (e.g., `./filter vg input.bmp output.bmp` for vignette then grayscale).
 
 You should not modify any of the function signatures, nor should you modify any other files other than helpers.c.
 
