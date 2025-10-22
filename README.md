@@ -144,6 +144,58 @@ Otherwise, it is set to **black** (`R = G = B = 0`).
 This results in a high-contrast, two-tone image where all intermediate shades are eliminated — essentially a hard binary “black-and-white” conversion.
 
 
+### 7.) The Edge Detection (Sobel) Algorithm
+
+The “edge detection” filter highlights sharp changes in pixel intensity, producing a sketch-like outline of the image.
+
+For each pixel, the horizontal and vertical gradients are calculated using a 3×3 Sobel kernel applied to the surrounding pixels:
+
+Horizontal (Gx):
+-1 0 1
+-2 0 2
+-1 0 1
+
+Vertical (Gy):
+-1 -2 -1
+0 0 0
+1 2 1
+
+The gradient magnitude for each color channel is then computed as:
+
+value
+=
+𝐺
+𝑥
+2
++
+𝐺
+𝑦
+2
+value=
+Gx
+2
++Gy
+2
+	​
+
+
+The result is clamped between 0 and 255 and replaces the original pixel value. This produces a monochrome image where edges are highlighted, giving a pencil-sketch effect.
+
+
+
+### Pixelate Filter
+
+The “Pixelate” filter divides the image into small square blocks (default 5x5) and replaces each block with the average color of its pixels. This creates a mosaic-like effect, useful for artistic rendering or obscuring parts of an image for privacy.
+
+Algorithm Steps:
+
+1. Divide the image into blocks of size blockSize x blockSize.
+2. For each block:
+   a. Compute the average Red, Green, and Blue values of all pixels in the block.
+   b. Replace all pixels in the block with the computed average color.
+3. Repeat until all blocks are processed.
+
+
 ---
 
 ### Usage
