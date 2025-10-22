@@ -113,6 +113,22 @@ For a pixel along the edge or corner, like pixel 15, we would still look for all
 
 If you apply the above algorithm to each pixel in the image, the result should look like a blurry, out-of-focus version of the original.
 
+### 6.) Brightness Adjustment Filter
+- **Flag:** `-B <value>`
+- **Description:** Increases or decreases the brightness of the image by adding a fixed value to each pixel's R, G, and B channels. The value should be an integer—positive to increase, negative to decrease.
+- **Usage examples:**
+```sh
+./filter -B 40 input.bmp output.bmp   # Increase brightness by 40
+./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
+```
+
+### 7.) Vignette Filter
+- **Flag:** `-v`
+- **Description:** Applies a vignette effect that darkens the corners of the image to focus attention towards the center.
+- **Usage example:**
+```sh
+./filter -v input.bmp output.bmp
+```
 ### 5.) The Vignette Algorithm
 
 The vignette filter gives an image a cinematic look by gradually darkening its corners. 
