@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsiv";
+    char *filters = "bgrsivt";
 
     
     char filterArr[argc-3];
@@ -127,6 +127,9 @@ int main(int argc, char *argv[])
         // Vignette
         case 'v':
             vignette(height, width, image);
+            break;
+        case 't':
+            threshold(height, width, image);
             break;
         default:
             printf("%c", &filterArr[i]);
