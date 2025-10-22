@@ -114,24 +114,28 @@ For a pixel along the edge or corner, like pixel 15, we would still look for all
 If you apply the above algorithm to each pixel in the image, the result should look like a blurry, out-of-focus version of the original.
 
 ### 5.) Threshold Filter (Black & White)
-
 - **Flag:** `-t`
 - **Description:** Converts each pixel in the image to pure black or white based on its intensity. If the average of red, green, and blue is greater than or equal to 128, the pixel becomes white (255,255,255); otherwise, it becomes black (0,0,0).
 - **Usage example:**
-
 ```sh
 ./filter -t input.bmp output.bmp
 ```
 
 ### 6.) Brightness Adjustment Filter
-
 - **Flag:** `-B <value>`
 - **Description:** Increases or decreases the brightness of the image by adding a fixed value to each pixel's R, G, and B channels. The value should be an integer—positive to increase, negative to decrease.
-- **Usage example:**
-
+- **Usage examples:**
 ```sh
 ./filter -B 40 input.bmp output.bmp   # Increase brightness by 40
 ./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
+```
+
+### 7.) Vignette Filter
+- **Flag:** `-v`
+- **Description:** Applies a vignette effect that darkens the corners of the image to focus attention towards the center.
+- **Usage example:**
+```sh
+./filter -v input.bmp output.bmp
 ```
 
 You should not modify any of the function signatures, nor should you modify any other files other than helpers.c.
