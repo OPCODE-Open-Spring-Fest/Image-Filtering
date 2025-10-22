@@ -126,11 +126,6 @@ int main(int argc, char *argv[])
             invert(height,width,image);
             break;
 
-        // Threshold (black & white)
-        case 't':
-            threshold(height, width, image);
-            break;
-
         // Brightness Adjust
         case 'B': {
             int brightness_value = 0;
