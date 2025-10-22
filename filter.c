@@ -7,29 +7,27 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivt";
+    char *filters = "bgrsivtd";
+
+   
 
     
-    char filterArr[argc-3];
-    
-    // gets all filter flags and checks validity
-    for(int i=0; i<argc; i++){
-        char temp = getopt(argc,argv,filters);
-        if(temp == -1) break;
-        filterArr[i]= temp;
-        if(filterArr[i] == '?') {
-            printf("Invalid filter option");
-            return 1;
-        }
-    }
-    
+    char filterArr[argc - 3];
+int filterCount = 0;
 
-    // Ensure proper usage
-    if (argc < optind + 2)
+while ((opt = getopt(argc, argv, filters)) != -1)
+{
+    if (opt == '?')
     {
-        printf("Usage: ./filter [flag] infile outfile\n");
-        return 3;
+        printf("Invalid filter option\n");
+        return 2;
     }
+    filterArr[filterCount++] = (char)opt;
+}
+
+    
+
+    
 
     // Remember filenames
     char *infile = argv[optind];
@@ -131,10 +129,18 @@ int main(int argc, char *argv[])
         case 't':
             threshold(height, width, image);
             break;
-        default:
-            printf("%c", &filterArr[i]);
-            break;
-        
+
+            case 'd':  // Edge Detection
+    detect_edges(height, width, image);
+    break;
+
+      default:
+    printf("Unknown filter: %c\n", filterArr[i]);
+    free(image);
+    fclose(inptr);
+    fclose(outptr);
+    return 7;
+
     }
     }
     // Write outfile's BITMAPFILEHEADER

@@ -1,3 +1,9 @@
+#ifndef HELPERS_H
+#define HELPERS_H
+
+#include <stdio.h>
+#include <math.h>
+
 #include "bmp.h"
 
 // Convert image to grayscale
@@ -19,3 +25,8 @@ void vignette(int height, int width, RGBTRIPLE image[height][width]);
 
 //Threshold Filter(Black & White)
 void threshold(int height, int width, RGBTRIPLE image[height][width]);
+
+// **New: Edge Detection filter**
+void detect_edges(int height, int width, RGBTRIPLE image[height][width]);
+
+#endif
