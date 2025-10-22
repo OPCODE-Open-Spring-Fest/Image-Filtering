@@ -61,7 +61,30 @@ void invert(int height, int width, RGBTRIPLE image[height][width]){
 }
 void sepia(int height, int width, RGBTRIPLE image[height][width]){
 
-// Convert image to sepia
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int originalRed = image[i][j].rgbtRed;
+            int originalGreen = image[i][j].rgbtGreen;
+            int originalBlue = image[i][j].rgbtBlue;
+
+            int sepiaRed = round(0.393 * originalRed + 0.769 * originalGreen + 0.189 * originalBlue);
+            int sepiaGreen = round(0.349 * originalRed + 0.686 * originalGreen + 0.168 * originalBlue);
+            int sepiaBlue = round(0.272 * originalRed + 0.534 * originalGreen + 0.131 * originalBlue);
+
+            if (sepiaRed > 255)
+                sepiaRed = 255;
+            if (sepiaGreen > 255)
+                sepiaGreen = 255;
+            if (sepiaBlue > 255)
+                sepiaBlue = 255;
+
+            image[i][j].rgbtRed = sepiaRed;
+            image[i][j].rgbtGreen = sepiaGreen;
+            image[i][j].rgbtBlue = sepiaBlue;
+        }
+    }
 
 }
 
@@ -128,7 +151,7 @@ void blur(int height, int width, RGBTRIPLE image[height][width]){
 
 // Blur image
 
-}
+
 void vignette(int height, int width, RGBTRIPLE image[height][width]){
     float cx = width / 2.0; //  center of the image
     float cy= height / 2.0;
