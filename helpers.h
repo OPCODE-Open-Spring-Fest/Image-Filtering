@@ -17,3 +17,6 @@ void blur(int height, int width, RGBTRIPLE image[height][width]);
 
 // Threshold filter (black and white)
 void threshold(int height, int width, RGBTRIPLE image[height][width]);
+
+// Brightness adjustment filter
+void brightness(int height, int width, RGBTRIPLE image[height][width], int value);

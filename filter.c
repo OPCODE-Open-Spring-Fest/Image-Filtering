@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsit";
+    char *filters = "bgrsitB";
 
     
     char filterArr[argc-3];
@@ -130,6 +130,21 @@ int main(int argc, char *argv[])
         case 't':
             threshold(height, width, image);
             break;
+
+        // Brightness Adjust
+        case 'B': {
+            int brightness_value = 0;
+            // Get brightness value from argv, after -B flag (assume it appears as -B val)
+            if (optind < argc) {
+                brightness_value = atoi(argv[optind]);
+                optind++;
+            } else {
+                printf("Missing value for -B (brightness) flag.\n");
+                return 8;
+            }
+            brightness(height, width, image, brightness_value);
+            break;
+        }
         default:
             printf("%c", &filterArr[i]);
             break;

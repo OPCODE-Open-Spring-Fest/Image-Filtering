@@ -123,6 +123,17 @@ If you apply the above algorithm to each pixel in the image, the result should l
 ./filter -t input.bmp output.bmp
 ```
 
+### 6.) Brightness Adjustment Filter
+
+- **Flag:** `-B <value>`
+- **Description:** Increases or decreases the brightness of the image by adding a fixed value to each pixel's R, G, and B channels. The value should be an integer—positive to increase, negative to decrease.
+- **Usage example:**
+
+```sh
+./filter -B 40 input.bmp output.bmp   # Increase brightness by 40
+./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
+```
+
 You should not modify any of the function signatures, nor should you modify any other files other than helpers.c.
 
 Consider the following grid of pixels, where we’ve numbered each pixel.
