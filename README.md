@@ -122,6 +122,22 @@ If you apply the above algorithm to each pixel in the image, the result should l
 ./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
 ```
 
+### 6.) The Threshold Algorithm
+
+The “threshold” filter converts a colorful image into a pure black-and-white one based on pixel intensity.
+
+For each pixel, the intensity is calculated as the average of its red, green, and blue values:
+
+\[
+\text{intensity} = \frac{(R + G + B)}{3}
+\]
+
+If the intensity is **greater than or equal to 128**, the pixel is set to **white** (`R = G = B = 255`).
+Otherwise, it is set to **black** (`R = G = B = 0`).
+
+This results in a high-contrast, two-tone image where all intermediate shades are eliminated — essentially a hard binary “black-and-white” conversion.
+
+
 ---
 
 ### Usage
