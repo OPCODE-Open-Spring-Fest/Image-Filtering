@@ -19,3 +19,6 @@ void vignette(int height, int width, RGBTRIPLE image[height][width]);
 
 //Threshold Filter(Black & White)
 void threshold(int height, int width, RGBTRIPLE image[height][width]);
+
+// Glow filter
+void glow(int height, int width, RGBTRIPLE image[height][width]);

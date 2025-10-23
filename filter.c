@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivt";
+    char *filters = "bgrsivtw";
 
     
     char filterArr[argc-3];
@@ -130,6 +130,9 @@ int main(int argc, char *argv[])
             break;
         case 't':
             threshold(height, width, image);
+            break;
+        case 'w':
+            glow(height, width, image);
             break;
         default:
             printf("%c", &filterArr[i]);
