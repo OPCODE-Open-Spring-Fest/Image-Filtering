@@ -149,8 +149,24 @@ void blur(int height, int width, RGBTRIPLE image[height][width]){
     free(temp);
 }
 
-// Blur image
-
+void brightness(int height, int width, RGBTRIPLE image[height][width], int value) {
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            int r = image[i][j].rgbtRed + value;
+            int g = image[i][j].rgbtGreen + value;
+            int b = image[i][j].rgbtBlue + value;
+            if (r > 255) r = 255;
+            if (g > 255) g = 255;
+            if (b > 255) b = 255;
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
+            image[i][j].rgbtRed = r;
+            image[i][j].rgbtGreen = g;
+            image[i][j].rgbtBlue = b;
+        }
+    }
+}
 
 void vignette(int height, int width, RGBTRIPLE image[height][width]){
     float cx = width / 2.0; //  center of the image
