@@ -133,6 +133,9 @@ int main(int argc, char *argv[])
         case 't':
             threshold(height, width, image);
             break;
+        case 'w':
+            glow(height, width, image);
+            break;
         
         case 'd':  // Edge Detection
             detect_edges(height, width, image);
