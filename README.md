@@ -113,20 +113,14 @@ For a pixel along the edge or corner, like pixel 15, we would still look for all
 
 If you apply the above algorithm to each pixel in the image, the result should look like a blurry, out-of-focus version of the original.
 
-### 5.) The Vignette Algorithm
-
-The vignette filter gives an image a cinematic look by gradually darkening its corners. 
-
-**Algorithm:**
-1. Compute the center of the image (cx, cy).
-2. Calculate the maximum distance from the center to any corner (max_dis).
-3. For each pixel at (i, j):
-   - Calculate the Euclidean distance from this pixel to the center: dist = sqrt((j - cx)^2 + (i - cy)^2)
-   - Compute a vignette factor: vig = 1.0 - (dist / max_dis)
-   - Clamp vig between 0.0 (fully dark) and 1.0 (original color).
-   - Multiply the pixel's R, G, B values by vig to darken farther-away pixels more thoroughly.
-
-If you apply this algorithm, your resulting image will have gently darkened corners and an undisturbed/sunnier center.
+### 6.) Brightness Adjustment Filter
+- **Flag:** `-B <value>`
+- **Description:** Increases or decreases the brightness of the image by adding a fixed value to each pixel's R, G, and B channels. The value should be an integer—positive to increase, negative to decrease.
+- **Usage examples:**
+```sh
+./filter -B 40 input.bmp output.bmp   # Increase brightness by 40
+./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
+```
 
 ### 6.) The Threshold Algorithm
 

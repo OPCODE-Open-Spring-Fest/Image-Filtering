@@ -7,20 +7,20 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtw";
+    char *filters = "bgrsivB:tw";
 
     
     char filterArr[argc-3];
+    int filterCount = 0;
     
     // gets all filter flags and checks validity
-    for(int i=0; i<argc; i++){
-        char temp = getopt(argc,argv,filters);
-        if(temp == -1) break;
-        filterArr[i]= temp;
-        if(filterArr[i] == '?') {
-            printf("Invalid filter option");
+    int opt;
+    while ((opt = getopt(argc, argv, filters)) != -1) {
+        if (opt == '?') {
+            printf("Invalid filter option\n");
             return 1;
         }
+        filterArr[filterCount++] = opt;
     }
     
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     }
 
     // Filter image
-    for(int i=0; i<argc-3; i++){
+    for(int i=0; i<filterCount; i++){
     switch (filterArr[i])
     {
         // Blur
@@ -124,27 +124,30 @@ int main(int argc, char *argv[])
         case 'i':
             invert(height,width,image);
             break;
+
         // Vignette
         case 'v':
             vignette(height, width, image);
             break;
-        case 't':
-            threshold(height, width, image);
+
+        // Brightness Adjust
+        case 'B': {
+            int brightness_value = atoi(optarg);
+            brightness(height, width, image, brightness_value);
             break;
         case 'w':
             glow(height, width, image);
             break;
+        }
         default:
-            printf("%c", &filterArr[i]);
+            printf("Unknown filter: %c\n", filterArr[i]);
             break;
         
     }
-    }
+    
     // Write outfile's BITMAPFILEHEADER
     fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
 
-    // Write outfile's BITMAPINFOHEADER
-    fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
 
     // Write new pixels to outfile
     for (int i = 0; i < height; i++)
