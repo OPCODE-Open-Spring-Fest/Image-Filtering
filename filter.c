@@ -147,6 +147,10 @@ int main(int argc, char *argv[])
             brightness(height, width, image, brightness_value);
             break;
         }
+        case 'w':{
+            glow(height, width, image);
+            break;
+        }
         default:
             printf("Unknown filter: %c\n", filterArr[i]);
             free(image);
