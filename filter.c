@@ -7,24 +7,21 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtdp";
+    char *filters = "bgrsivtp";
 
    
 
-    
-    char filterArr[argc - 3];
-int filterCount = 0;
-
-while ((opt = getopt(argc, argv, filters)) != -1)
-{
-    if (opt == '?')
-    {
-        printf("Invalid filter option\n");
-        return 2;
-    }
-    filterArr[filterCount++] = (char)opt;
+    char filterArr[argc-3];
+    // gets all filter flags and checks validity
+for(int i=0; i<argc; i++){
+char temp = getopt(argc,argv,filters);
+if(temp == -1) break;
+filterArr[i]= temp;
+if(filterArr[i] == '?') {
+printf("Invalid filter option");
+return 1;
 }
-
+}
     
 
     
@@ -130,15 +127,13 @@ while ((opt = getopt(argc, argv, filters)) != -1)
             threshold(height, width, image);
             break;
 
-            case 'd':  // Edge Detection
-    detect_edges(height, width, image);
-    break;
+            
 
 
 
-    case 'p':
-    apply_pixelate(height, width, image, 5); // default block size = 5
-    break;
+   case 'p':
+            apply_pixelate(height, width, image, 5);
+            break;
 
       default:
     printf("Unknown filter: %c\n", filterArr[i]);

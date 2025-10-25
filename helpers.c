@@ -202,79 +202,15 @@ void threshold(int height, int width, RGBTRIPLE image[height][width])
 }
 
 
-// ----------------------
-// EDGE DETECTION (SOBEL)
-// ----------------------
-void detect_edges(int height, int width, RGBTRIPLE image[height][width])
+
+// Pixelate filter — separate function, not nested
+void apply_pixelate(int height, int width, RGBTRIPLE image[height][width], int blockSize)
 {
-    // Temporary copy of the image
+
     RGBTRIPLE **copy = malloc(height * sizeof(RGBTRIPLE *));
     for (int i = 0; i < height; i++)
         copy[i] = malloc(width * sizeof(RGBTRIPLE));
 
-    for (int i = 0; i < height; i++)
-        for (int j = 0; j < width; j++)
-            copy[i][j] = image[i][j];
-
-    // Sobel kernels
-    int Gx[3][3] = {
-        {-1, 0, 1},
-        {-2, 0, 2},
-        {-1, 0, 1}
-    };
-    int Gy[3][3] = {
-        {-1, -2, -1},
-        { 0,  0,  0},
-        { 1,  2,  1}
-    };
-
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            int sumRx = 0, sumGx = 0, sumBx = 0;
-            int sumRy = 0, sumGy = 0, sumBy = 0;
-
-            for (int di = -1; di <= 1; di++)
-            {
-                for (int dj = -1; dj <= 1; dj++)
-                {
-                    int ni = i + di;
-                    int nj = j + dj;
-
-                    if (ni >= 0 && ni < height && nj >= 0 && nj < width)
-                    {
-                        RGBTRIPLE pixel = copy[ni][nj];
-                        int kx = Gx[di + 1][dj + 1];
-                        int ky = Gy[di + 1][dj + 1];
-
-                        sumRx += pixel.rgbtRed * kx;
-                        sumGx += pixel.rgbtGreen * kx;
-                        sumBx += pixel.rgbtBlue * kx;
-
-                        sumRy += pixel.rgbtRed * ky;
-                        sumGy += pixel.rgbtGreen * ky;
-                        sumBy += pixel.rgbtBlue * ky;
-                    }
-                }
-            }
-
-            // Calculate gradient magnitude and clamp
-            int red   = min(max((int)round(sqrt(sumRx*sumRx + sumRy*sumRy)), 0), 255);
-            int green = min(max((int)round(sqrt(sumGx*sumGx + sumGy*sumGy)), 0), 255);
-            int blue  = min(max((int)round(sqrt(sumBx*sumBx + sumBy*sumBy)), 0), 255);
-
-            image[i][j].rgbtRed   = red;
-            image[i][j].rgbtGreen = green;
-            image[i][j].rgbtBlue  = blue;
-        }
-    }
-
-
-
-// Pixelate Filter
-void apply_pixelate(int height, int width, RGBTRIPLE image[height][width], int blockSize)
-{
     for (int i = 0; i < height; i += blockSize)
     {
         for (int j = 0; j < width; j += blockSize)
@@ -282,49 +218,40 @@ void apply_pixelate(int height, int width, RGBTRIPLE image[height][width], int b
             int sumRed = 0, sumGreen = 0, sumBlue = 0;
             int count = 0;
 
-            // Compute average color in the block
-            for (int bi = 0; bi < blockSize; bi++)
+            for (int bi = 0; bi < blockSize && (i + bi) < height; bi++)
             {
-                for (int bj = 0; bj < blockSize; bj++)
+                for (int bj = 0; bj < blockSize && (j + bj) < width; bj++)
                 {
-                    int ni = i + bi;
-                    int nj = j + bj;
-                    if (ni < height && nj < width)
-                    {
-                        sumRed += image[ni][nj].rgbtRed;
-                        sumGreen += image[ni][nj].rgbtGreen;
-                        sumBlue += image[ni][nj].rgbtBlue;
-                        count++;
-                    }
+                    sumRed += image[i + bi][j + bj].rgbtRed;
+                    sumGreen += image[i + bi][j + bj].rgbtGreen;
+                    sumBlue += image[i + bi][j + bj].rgbtBlue;
+                    count++;
                 }
             }
 
-            int avgRed = sumRed / count;
-            int avgGreen = sumGreen / count;
-            int avgBlue = sumBlue / count;
+            unsigned char avgRed = sumRed / count;
+            unsigned char avgGreen = sumGreen / count;
+            unsigned char avgBlue = sumBlue / count;
 
-            // Set all pixels in the block to the average color
-            for (int bi = 0; bi < blockSize; bi++)
+            for (int bi = 0; bi < blockSize && (i + bi) < height; bi++)
             {
-                for (int bj = 0; bj < blockSize; bj++)
+                for (int bj = 0; bj < blockSize && (j + bj) < width; bj++)
                 {
-                    int ni = i + bi;
-                    int nj = j + bj;
-                    if (ni < height && nj < width)
-                    {
-                        image[ni][nj].rgbtRed = avgRed;
-                        image[ni][nj].rgbtGreen = avgGreen;
-                        image[ni][nj].rgbtBlue = avgBlue;
-                    }
+                    image[i + bi][j + bj].rgbtRed = avgRed;
+                    image[i + bi][j + bj].rgbtGreen = avgGreen;
+                    image[i + bi][j + bj].rgbtBlue = avgBlue;
                 }
             }
         }
+   
+   
     }
-}
 
 
-    // Free temporary array
     for (int i = 0; i < height; i++)
-        free(copy[i]);
-    free(copy);
+    free(copy[i]);
+free(copy);
 }
+
+// Free temporary array
+
