@@ -15,14 +15,14 @@ int main(int argc, char *argv[])
     char filterArr[argc - 3];
 int filterCount = 0;
 
-while ((opt = getopt(argc, argv, filters)) != -1)
-{
-    if (opt == '?')
-    {
-        printf("Invalid filter option\n");
-        return 2;
-    }
-    filterArr[filterCount++] = (char)opt;
+for(int i=0; i<argc; i++){
+char temp = getopt(argc,argv,filters);
+if(temp == -1) break;
+filterArr[i]= temp;
+if(filterArr[i] == '?') {
+printf("Invalid filter option");
+return 1;
+}
 }
 
     
