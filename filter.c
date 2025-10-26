@@ -7,27 +7,29 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtd";
-
-   
+    char *filters = "bgrsivtdB:";
 
     
-    char filterArr[argc - 3];
-int filterCount = 0;
-
-for(int i=0; i<argc; i++){
-char temp = getopt(argc,argv,filters);
-if(temp == -1) break;
-filterArr[i]= temp;
-if(filterArr[i] == '?') {
-printf("Invalid filter option");
-return 1;
-}
-}
-
+    char filterArr[argc-3];
+    int filterCount = 0;
+    
+    // gets all filter flags and checks validity
+    int opt;
+    while ((opt = getopt(argc, argv, filters)) != -1) {
+        if (opt == '?') {
+            printf("Invalid filter option\n");
+            return 1;
+        }
+        filterArr[filterCount++] = opt;
+    }
     
 
-    
+    // Ensure proper usage
+    if (argc < optind + 2)
+    {
+        printf("Usage: ./filter [flag] infile outfile\n");
+        return 3;
+    }
 
     // Remember filenames
     char *infile = argv[optind];
@@ -96,7 +98,7 @@ return 1;
     }
 
     // Filter image
-    for(int i=0; i<argc-3; i++){
+    for(int i=0; i<filterCount; i++){
     switch (filterArr[i])
     {
         // Blur
@@ -122,25 +124,33 @@ return 1;
         case 'i':
             invert(height,width,image);
             break;
+
         // Vignette
         case 'v':
             vignette(height, width, image);
             break;
+
         case 't':
             threshold(height, width, image);
             break;
-
-            case 'd':  // Edge Detection
-    detect_edges(height, width, image);
-    break;
-
-      default:
-    printf("Unknown filter: %c\n", filterArr[i]);
-    free(image);
-    fclose(inptr);
-    fclose(outptr);
-    return 7;
-
+        
+        case 'd':  // Edge Detection
+            detect_edges(height, width, image);
+            break;
+            
+        // Brightness Adjust
+        case 'B': {
+            int brightness_value = atoi(optarg);
+            brightness(height, width, image, brightness_value);
+            break;
+        }
+        default:
+            printf("Unknown filter: %c\n", filterArr[i]);
+            free(image);
+            fclose(inptr);
+            fclose(outptr);
+            return 7;
+        
     }
     }
     // Write outfile's BITMAPFILEHEADER
