@@ -1,6 +1,7 @@
 #include "helpers.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <math.h>
 #include "bmp.h"
 int min(int a,int b){
     if(a<b) return a;
@@ -283,4 +284,75 @@ void detect_edges(int height, int width, RGBTRIPLE image[height][width])
     for (int i = 0; i < height; i++)
         free(copy[i]);
     free(copy);
+}
+void glow(int height, int width, RGBTRIPLE image[height][width])
+{
+    // Step 1: make a copy of the original
+    RGBTRIPLE **original = malloc(height * sizeof(RGBTRIPLE *));
+    RGBTRIPLE **blurred = malloc(height * sizeof(RGBTRIPLE *));
+    for (int i = 0; i < height; i++)
+    {
+        original[i] = malloc(width * sizeof(RGBTRIPLE));
+        blurred[i] = malloc(width * sizeof(RGBTRIPLE));
+        for (int j = 0; j < width; j++)
+        {
+            original[i][j] = image[i][j];
+        }
+    }
+
+    // Step 2: apply a *mild* blur to copy (smaller kernel)
+    int kernelSize = 11;
+    int offset = kernelSize / 2;
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int sumRed = 0, sumGreen = 0, sumBlue = 0, count = 0;
+
+            for (int ki = -offset; ki <= offset; ki++)
+            {
+                for (int kj = -offset; kj <= offset; kj++)
+                {
+                    int ni = i + ki, nj = j + kj;
+                    if (ni >= 0 && ni < height && nj >= 0 && nj < width)
+                    {
+                        sumRed += original[ni][nj].rgbtRed;
+                        sumGreen += original[ni][nj].rgbtGreen;
+                        sumBlue += original[ni][nj].rgbtBlue;
+                        count++;
+                    }
+                }
+            }
+
+            blurred[i][j].rgbtRed = sumRed / count;
+            blurred[i][j].rgbtGreen = sumGreen / count;
+            blurred[i][j].rgbtBlue = sumBlue / count;
+        }
+    }
+
+    // Step 3: blend original + blurred to produce glow
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            float blend = 0.3; // glow intensity
+            int newRed = (1 - blend) * original[i][j].rgbtRed + blend * blurred[i][j].rgbtRed;
+            int newGreen = (1 - blend) * original[i][j].rgbtGreen + blend * blurred[i][j].rgbtGreen;
+            int newBlue = (1 - blend) * original[i][j].rgbtBlue + blend * blurred[i][j].rgbtBlue;
+
+            image[i][j].rgbtRed = min(255, newRed);
+            image[i][j].rgbtGreen = min(255, newGreen);
+            image[i][j].rgbtBlue = min(255, newBlue);
+        }
+    }
+
+    // Step 4: cleanup
+    for (int i = 0; i < height; i++)
+    {
+        free(original[i]);
+        free(blurred[i]);
+    }
+    free(original);
+    free(blurred);
 }

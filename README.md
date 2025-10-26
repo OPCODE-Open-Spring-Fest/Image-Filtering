@@ -177,6 +177,18 @@ The result is clamped between 0 and 255 and replaces the original pixel value. T
 
 ---
 
+### 8.) The Glow Algorithm
+
+The “Glow” filter gives bright regions of an image a soft, luminous halo, similar to a cinematic bloom effect. This filter works by blending the original image with a blurred version of itself.
+
+The algorithm first creates a copy of the image and applies a mild box blur (using a smaller kernel than the main blur filter) to it. Then, for each pixel, the final color values are calculated by combining the original pixel's color with the new blurred pixel's color using a weighted average:
+
+-   `finalRed = 0.7 * originalRed + 0.3 * blurredRed`
+-   `finalGreen = 0.7 * originalGreen + 0.3 * blurredGreen`
+-   `finalBlue = 0.7 * originalBlue + 0.3 * blurredBlue`
+
+The resulting values are rounded to the nearest integer and capped at 255. This process brightens the image and causes the light to "bleed" from bright areas into darker ones, creating a soft, luminous effect.
+
 ### Usage
 
 To apply a filter via command-line:
@@ -186,6 +198,13 @@ To apply a filter via command-line:
 - `b`: blur
 - `i`: invert
 - `v`: vignette
+- `G`: glow
+- `t`: threshold
+- `d`: edge detection
+- `B <value>`: brightness
+
+Example for glow:
+./filter -G input.bmp output.bmp
 
 For vignette:
 ```
