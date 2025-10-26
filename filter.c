@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtdB:G";
+    char *filters = "bgrsivtdGB:";
 
     
     char filterArr[argc-3];
