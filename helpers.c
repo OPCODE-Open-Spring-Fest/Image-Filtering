@@ -214,3 +214,73 @@ void threshold(int height, int width, RGBTRIPLE image[height][width])
         }
     }
 }
+void detect_edges(int height, int width, RGBTRIPLE image[height][width])
+{
+    // Temporary copy of the image
+    RGBTRIPLE **copy = malloc(height * sizeof(RGBTRIPLE *));
+    for (int i = 0; i < height; i++)
+        copy[i] = malloc(width * sizeof(RGBTRIPLE));
+
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++)
+            copy[i][j] = image[i][j];
+
+    // Sobel kernels
+    int Gx[3][3] = {
+        {-1, 0, 1},
+        {-2, 0, 2},
+        {-1, 0, 1}
+    };
+    int Gy[3][3] = {
+        {-1, -2, -1},
+        { 0,  0,  0},
+        { 1,  2,  1}
+    };
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int sumRx = 0, sumGx = 0, sumBx = 0;
+            int sumRy = 0, sumGy = 0, sumBy = 0;
+
+            for (int di = -1; di <= 1; di++)
+            {
+                for (int dj = -1; dj <= 1; dj++)
+                {
+                    int ni = i + di;
+                    int nj = j + dj;
+
+                    if (ni >= 0 && ni < height && nj >= 0 && nj < width)
+                    {
+                        RGBTRIPLE pixel = copy[ni][nj];
+                        int kx = Gx[di + 1][dj + 1];
+                        int ky = Gy[di + 1][dj + 1];
+
+                        sumRx += pixel.rgbtRed * kx;
+                        sumGx += pixel.rgbtGreen * kx;
+                        sumBx += pixel.rgbtBlue * kx;
+
+                        sumRy += pixel.rgbtRed * ky;
+                        sumGy += pixel.rgbtGreen * ky;
+                        sumBy += pixel.rgbtBlue * ky;
+                    }
+                }
+            }
+
+            // Calculate gradient magnitude and clamp
+            int red   = min(max((int)round(sqrt(sumRx*sumRx + sumRy*sumRy)), 0), 255);
+            int green = min(max((int)round(sqrt(sumGx*sumGx + sumGy*sumGy)), 0), 255);
+            int blue  = min(max((int)round(sqrt(sumBx*sumBx + sumBy*sumBy)), 0), 255);
+
+            image[i][j].rgbtRed   = red;
+            image[i][j].rgbtGreen = green;
+            image[i][j].rgbtBlue  = blue;
+        }
+    }
+
+    // Free temporary array
+    for (int i = 0; i < height; i++)
+        free(copy[i]);
+    free(copy);
+}

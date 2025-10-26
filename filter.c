@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivB:";
+    char *filters = "bgrsivtdB:";
 
     
     char filterArr[argc-3];
@@ -130,6 +130,14 @@ int main(int argc, char *argv[])
             vignette(height, width, image);
             break;
 
+        case 't':
+            threshold(height, width, image);
+            break;
+        
+        case 'd':  // Edge Detection
+            detect_edges(height, width, image);
+            break;
+            
         // Brightness Adjust
         case 'B': {
             int brightness_value = atoi(optarg);
@@ -138,7 +146,10 @@ int main(int argc, char *argv[])
         }
         default:
             printf("Unknown filter: %c\n", filterArr[i]);
-            break;
+            free(image);
+            fclose(inptr);
+            fclose(outptr);
+            return 7;
         
     }
     }
