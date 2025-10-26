@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtdB:";
+    char *filters = "bgrsivtdB:G";
 
     
     char filterArr[argc-3];
@@ -133,10 +133,6 @@ int main(int argc, char *argv[])
         case 't':
             threshold(height, width, image);
             break;
-        case 'w':
-            glow(height, width, image);
-            break;
-        
         case 'd':  // Edge Detection
             detect_edges(height, width, image);
             break;
@@ -147,10 +143,9 @@ int main(int argc, char *argv[])
             brightness(height, width, image, brightness_value);
             break;
         }
-        case 'w':{
+        case 'G': 
             glow(height, width, image);
             break;
-        }
         default:
             printf("Unknown filter: %c\n", filterArr[i]);
             free(image);

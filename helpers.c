@@ -1,6 +1,7 @@
 #include "helpers.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <math.h>
 #include "bmp.h"
 int min(int a,int b){
     if(a<b) return a;
@@ -335,7 +336,7 @@ void glow(int height, int width, RGBTRIPLE image[height][width])
     {
         for (int j = 0; j < width; j++)
         {
-            float blend = 0.4; // glow intensity
+            float blend = 0.3; // glow intensity
             int newRed = (1 - blend) * original[i][j].rgbtRed + blend * blurred[i][j].rgbtRed;
             int newGreen = (1 - blend) * original[i][j].rgbtGreen + blend * blurred[i][j].rgbtGreen;
             int newBlue = (1 - blend) * original[i][j].rgbtBlue + blend * blurred[i][j].rgbtBlue;
