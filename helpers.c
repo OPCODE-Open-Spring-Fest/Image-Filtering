@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include "bmp.h"
+#include <string.h>
+
+#define LEVELS 16
+#define RADIUS 8
+
 int min(int a,int b){
     if(a<b) return a;
     return b;
@@ -11,6 +16,7 @@ int max(int a,int b){
     if(a>b) return a;
     return b;
 }
+
 void grayscale(int height, int width, RGBTRIPLE image[height][width]){
    
     for(int i = 0; i < height; i++){
@@ -355,4 +361,65 @@ void glow(int height, int width, RGBTRIPLE image[height][width])
     }
     free(original);
     free(blurred);
+}
+// Oil Paint filter
+void oilpaint(int height, int width, RGBTRIPLE image[height][width]){ 
+     RGBTRIPLE **copy = malloc(height * sizeof(RGBTRIPLE *));
+    for (int i = 0; i < height; i++){
+        copy[i] = malloc(width * sizeof(RGBTRIPLE));
+        for (int j = 0; j < width; j++){
+            copy[i][j] = image[i][j];
+        }
+    }
+    // logic
+    for (int i = 0; i < height; i++){
+        for (int j = 0; j < width; j++){
+            int intensityCount[LEVELS];
+            long sumRed[LEVELS], sumGreen[LEVELS], sumBlue[LEVELS];
+            memset(intensityCount, 0, sizeof(intensityCount));
+            memset(sumRed, 0, sizeof(sumRed));
+            memset(sumGreen, 0, sizeof(sumGreen));
+            memset(sumBlue, 0, sizeof(sumBlue));
+
+            // Analyze neighborhood
+            for (int di = -RADIUS; di <= RADIUS; di++){
+                for (int dj = -RADIUS; dj <= RADIUS; dj++){
+                    int ni = i + di;
+                    int nj = j + dj;
+                    if (ni < 0 || ni >= height || nj < 0 || nj >= width)
+                        continue;
+
+                    RGBTRIPLE pixel = copy[ni][nj];
+                    int intensity = ((pixel.rgbtRed + pixel.rgbtGreen + pixel.rgbtBlue) / 3) * LEVELS / 256;
+                    if (intensity >= LEVELS)
+                        intensity = LEVELS - 1;
+
+                    intensityCount[intensity]++;
+                    sumRed[intensity] += pixel.rgbtRed;
+                    sumGreen[intensity] += pixel.rgbtGreen;
+                    sumBlue[intensity] += pixel.rgbtBlue;
+                }
+            }
+
+            int dominant = 0, maxCount = 0;
+            for (int k = 0; k < LEVELS; k++){
+                if (intensityCount[k] > maxCount){
+                    maxCount = intensityCount[k];
+                    dominant = k;
+                }
+            }
+            if (maxCount > 0){
+                int newRed = sumRed[dominant] / maxCount;
+                int newGreen = sumGreen[dominant] / maxCount;
+                int newBlue = sumBlue[dominant] / maxCount;
+
+                image[i][j].rgbtRed = (newRed / 32) * 32;
+                image[i][j].rgbtGreen = (newGreen / 32) * 32;
+                image[i][j].rgbtBlue = (newBlue / 32) * 32;
+            }
+        }
+    }
+    for (int i = 0; i < height; i++)
+        free(copy[i]);
+    free(copy);
 }

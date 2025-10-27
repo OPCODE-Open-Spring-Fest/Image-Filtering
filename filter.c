@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtdGB:";
+    char *filters = "bgrsivtdGBo";
 
     
     char filterArr[argc-3];
@@ -146,6 +146,10 @@ int main(int argc, char *argv[])
         case 'G': 
             glow(height, width, image);
             break;
+        case 'o':
+            oilpaint(height, width, image);
+            break;
+
         default:
             printf("Unknown filter: %c\n", filterArr[i]);
             free(image);
