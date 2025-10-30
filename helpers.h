@@ -35,4 +35,6 @@ void vignette(int height, int width, RGBTRIPLE image[height][width]);
 
 // Glow filter
 void glow(int height, int width, RGBTRIPLE image[height][width]);
+// Oil Paint filter
+void oilpaint(int height, int width, RGBTRIPLE image[height][width]);
 #endif
