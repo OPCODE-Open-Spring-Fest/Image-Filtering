@@ -1,0 +1,9 @@
+# Ignore all bmp, png, jpeg files
+*.bmp
+*.png
+*.jpeg
+
+# But keep specific ones that start with 'in.' for input ones
+!in.bmp
+!in.png
+!in.jpeg
