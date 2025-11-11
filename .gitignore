@@ -1,8 +1,0 @@
-# Ignore all bmp, png, jpeg files
-*.bmp
-*.png
-*.jpeg
-#excluded input image
-!in.bmp
-!in.png
-!in.jpeg
