@@ -343,6 +343,7 @@ You should not modify any of the function signatures, nor should you modify any 
 
 Consider the following grid of pixels, where we’ve numbered each pixel.
 
+
 <img width="528" height="492" alt="Screenshot 2025-10-16 041628" src="https://github.com/user-attachments/assets/5695cd6f-c535-42fc-8f8f-87bfbb362364" />
 
 ## Team and Credits
