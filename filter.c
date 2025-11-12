@@ -123,11 +123,9 @@ int main(int argc, char *argv[])
             break;
             
         // Brightness Adjust
-        case 'B': {
-            int brightness_value = atoi(optarg);
+        case 'B':
             brightness(height, width, image, brightness_value);
             break;
-        }
         case 'G': 
             glow(height, width, image);
             break;

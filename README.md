@@ -113,81 +113,138 @@ For a pixel along the edge or corner, like pixel 15, we would still look for all
 
 If you apply the above algorithm to each pixel in the image, the result should look like a blurry, out-of-focus version of the original.
 
-### 6.) Brightness Adjustment Filter
-- **Flag:** `-B <value>`
-- **Description:** Increases or decreases the brightness of the image by adding a fixed value to each pixel's R, G, and B channels. The value should be an integer—positive to increase, negative to decrease.
-- **Usage examples:**
-```sh
-./filter -B 40 input.bmp output.bmp   # Increase brightness by 40
-./filter -B -30 input.bmp output.bmp  # Decrease brightness by 30
-```
+### 5.) The Invert Algorithm
 
-### 6.) The Threshold Algorithm
+The “invert” filter creates a photographic negative of an image by reversing the RGB values.
+If a pixel has a value of 0 (no light), its inverted value becomes 255 (full light), and vice-versa.
 
-The “threshold” filter converts a colorful image into a pure black-and-white one based on pixel intensity.
+To compute the inverted colors, subtract each channel from 255:
 
-For each pixel, the intensity is calculated as the average of its red, green, and blue values:
+invertedRed = 255 - originalRed
+invertedGreen = 255 - originalGreen
+invertedBlue = 255 - originalBlue
 
-\[
-\text{intensity} = \frac{(R + G + B)}{3}
-\]
+However, simply inverting can sometimes change brightness unnaturally.
+To preserve the original brightness, we compute brightness for both original and inverted pixels, then apply a correction to match brightness levels.
+Finally, each pixel’s red, green, and blue values are set to the brightness-corrected inverted values.
+Applying this to every pixel produces a clean color-negative effect.
 
-If the intensity is **greater than or equal to 128**, the pixel is set to **white** (`R = G = B = 255`).
-Otherwise, it is set to **black** (`R = G = B = 0`).
+      
 
-This results in a high-contrast, two-tone image where all intermediate shades are eliminated — essentially a hard binary “black-and-white” conversion.
+### 6.) The Brightness Adjustment Algorithm
 
+Brightness adjustment increases or decreases the light intensity of each pixel.
 
-### 7.) The Edge Detection (Sobel) Algorithm
+To brighten or darken, a fixed value is added to each color channel:
 
-The “edge detection” filter highlights sharp changes in pixel intensity, producing a sketch-like outline of the image.
-
-For each pixel, the horizontal and vertical gradients are calculated using a 3×3 Sobel kernel applied to the surrounding pixels:
-
-Horizontal (Gx):
--1 0 1
--2 0 2
--1 0 1
-
-Vertical (Gy):
--1 -2 -1
-0 0 0
-1 2 1
-
-The gradient magnitude for each color channel is then computed as:
-
-value
-=
-𝐺
-𝑥
-2
-+
-𝐺
-𝑦
-2
-value=
-Gx
-2
-+Gy
-2
-	​
+newRed   = originalRed + value
+newGreen = originalGreen + value
+newBlue  = originalBlue + value
 
 
-The result is clamped between 0 and 255 and replaces the original pixel value. This produces a monochrome image where edges are highlighted, giving a pencil-sketch effect.
+To ensure values stay valid, the results are clamped between 0 and 255:
 
----
+if newValue > 255 -> 255  
+if newValue < 0   -> 0
 
-### 8.) The Glow Algorithm
 
-The “Glow” filter gives bright regions of an image a soft, luminous halo, similar to a cinematic bloom effect. This filter works by blending the original image with a blurred version of itself.
+A positive value increases brightness; a negative value decreases it.
+Applied across the image, this produces a uniformly brighter or darker picture.
 
-The algorithm first creates a copy of the image and applies a mild box blur (using a smaller kernel than the main blur filter) to it. Then, for each pixel, the final color values are calculated by combining the original pixel's color with the new blurred pixel's color using a weighted average:
+### 7.) The Vignette Algorithm
 
--   `finalRed = 0.7 * originalRed + 0.3 * blurredRed`
--   `finalGreen = 0.7 * originalGreen + 0.3 * blurredGreen`
--   `finalBlue = 0.7 * originalBlue + 0.3 * blurredBlue`
+The vignette filter darkens the edges of an image to draw attention toward the center.
 
-The resulting values are rounded to the nearest integer and capped at 255. This process brightens the image and causes the light to "bleed" from bright areas into darker ones, creating a soft, luminous effect.
+We compute the distance of each pixel from the image center:
+
+distance = sqrt((x - centerX)² + (y - centerY)²)
+
+
+Then calculate a scaling factor based on distance:
+
+vignetteStrength = 1 - (distance / maximumDistance)
+
+
+Each color channel is multiplied by this factor, so pixels farther from the center get darker.
+
+The result is a cinematic, spotlight-like fade toward the image edges.
+
+### 8.) The Threshold (Black & White) Algorithm
+
+Thresholding converts an image into pure black-and-white.
+
+First, compute the pixel’s grayscale average:
+
+avg = (Red + Green + Blue) / 3
+
+
+If the result is 128 or greater, the pixel becomes white.
+Otherwise, it becomes black:
+
+if avg >= 128 -> (255, 255, 255)
+else           -> (0, 0, 0)
+
+
+This filter produces a strong high-contrast binary image, similar to printed text or stencil art.
+
+### 9.) The Edge Detection Algorithm (Sobel Operator)
+
+Edge detection highlights boundaries and sharp transitions in an image.
+
+We apply the Sobel Kernel in both X and Y directions:
+
+Gx = horizontal edge kernel  
+Gy = vertical edge kernel
+
+
+For each pixel, we compute weighted sums for both kernels for each color channel:
+
+gradient = sqrt((Gx²) + (Gy²))
+
+
+The result is then clamped between 0 and 255.
+
+Pixels with strong intensity changes become bright (edges), while uniform areas appear dark — producing a clean outline/edge-map of the image.
+
+### 10.) The Glow Algorithm
+
+Glow enhances bright areas and gives a soft-highlight aura.
+
+Steps:
+
+Make a copy of the original image
+
+Apply a mild blur to the copy
+
+Blend the blurred and original pixels:
+
+newPixel = (1 - blend) * original + blend * blurred
+
+
+A small blend value (e.g., 0.3) produces a natural glow effect without washing out details.
+
+This creates a dreamy, halo-like enhancement around highlights — similar to portrait photography glow effects.
+
+### 11.) The Oil-Paint Algorithm
+
+The oil-paint effect simulates brush-stroke texture by grouping pixels based on intensity bins.
+
+For each pixel:
+
+Look at neighboring pixels within a radius
+
+Compute each neighbor’s intensity bucket:
+
+intensity = (R + G + B) / 3
+
+
+Count how many pixels fall into each intensity level
+
+Select the most common intensity bin
+
+Set the pixel’s final color to the average color of that bin
+
+This produces thick, paint-style textures and smoothed color patches, mimicking traditional oil-painting strokes.
 
 ### Usage
 
@@ -202,14 +259,84 @@ To apply a filter via command-line:
 - `t`: threshold
 - `d`: edge detection
 - `B <value>`: brightness
+- `o`: oilpaint
 
-Example for glow:
-./filter -G input.bmp output.bmp
+#### Examples:
 
-For vignette:
+```bash
+# Grayscale a PNG image
+./filter.exe -g input.png output.png
+# Sepia on JPEG image
+./filter.exe -s input.jpg output.jpg
+# Blur a BMP image
+./filter.exe -b input.bmp output.bmp
+# Chain multiple filters
+./filter.exe -g -b input.png output.png
+# Convert format (PNG to JPEG)
+./filter.exe -g input.png output.jpg
+# Brightness adjustment
+./filter.exe -B 40 input.jpg output.jpg
 ```
-./filter v input.bmp output.bmp
+
+You can also chain multiple filters by supplying multiple tags (e.g., `./filter.exe -v -g input.bmp output.bmp` for vignette then grayscale).
+
+## Supported Image Formats
+
+The Image-Filtering tool supports multiple image formats:
+
+- **BMP**: 24-bit uncompressed BMP files
+- **PNG**: PNG images with RGB color space (supports various PNG formats including RGBA, grayscale, palette - automatically converted to RGB)
+- **JPEG**: JPEG images with RGB color space (supports grayscale and RGB JPEGs)
+
+### Format Auto-Detection
+
+The tool automatically detects the input image format based on file signatures (magic bytes). The output format is determined by the file extension of the output filename. You can convert between formats by simply changing the output file extension.
+
+### Examples with Different Formats
+
+```bash
+# Process PNG image
+./filter.exe -g photo.png photo_gray.png
+# Process JPEG image
+./filter.exe -s photo.jpg photo_sepia.jpg
+# Convert PNG to JPEG
+./filter.exe -g input.png output.jpg
+# Convert JPEG to BMP
+./filter.exe -b input.jpg output.bmp
+# Chain filters on PNG
+./filter.exe -g -b input.png output.png
 ```
+
+## Building and Installation
+
+#### Windows (MSYS2)
+```bash
+# Install dependencies in MSYS2 UCRT64 terminal
+pacman -Syu
+pacman -S mingw-w64-ucrt-x86_64-gcc
+pacman -S mingw-w64-ucrt-x86_64-libpng
+pacman -S mingw-w64-ucrt-x86_64-libjpeg-turbo
+pacman -S make
+```
+
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt-get update
+sudo apt-get install libpng-dev libjpeg-dev build-essential
+```
+
+#### macOS
+```bash
+brew install libpng libjpeg
+```
+
+### Building
+
+```bash
+make clean
+make
+```
+
 You can also chain multiple filters by supplying multiple tags (e.g., `./filter vg input.bmp output.bmp` for vignette then grayscale).
 
 You should not modify any of the function signatures, nor should you modify any other files other than helpers.c.
