@@ -261,9 +261,81 @@ To apply a filter via command-line:
 - `B <value>`: brightness
 - `o`: oilpaint
 
-  
-Example for glow:
-filter -G input.bmp output.bmp
+#### Examples:
+
+```bash
+# Grayscale a PNG image
+./filter.exe -g input.png output.png
+# Sepia on JPEG image
+./filter.exe -s input.jpg output.jpg
+# Blur a BMP image
+./filter.exe -b input.bmp output.bmp
+# Chain multiple filters
+./filter.exe -g -b input.png output.png
+# Convert format (PNG to JPEG)
+./filter.exe -g input.png output.jpg
+# Brightness adjustment
+./filter.exe -B 40 input.jpg output.jpg
+```
+
+You can also chain multiple filters by supplying multiple tags (e.g., `./filter.exe -v -g input.bmp output.bmp` for vignette then grayscale).
+
+## Supported Image Formats
+
+The Image-Filtering tool supports multiple image formats:
+
+- **BMP**: 24-bit uncompressed BMP files
+- **PNG**: PNG images with RGB color space (supports various PNG formats including RGBA, grayscale, palette - automatically converted to RGB)
+- **JPEG**: JPEG images with RGB color space (supports grayscale and RGB JPEGs)
+
+### Format Auto-Detection
+
+The tool automatically detects the input image format based on file signatures (magic bytes). The output format is determined by the file extension of the output filename. You can convert between formats by simply changing the output file extension.
+
+### Examples with Different Formats
+
+```bash
+# Process PNG image
+./filter.exe -g photo.png photo_gray.png
+# Process JPEG image
+./filter.exe -s photo.jpg photo_sepia.jpg
+# Convert PNG to JPEG
+./filter.exe -g input.png output.jpg
+# Convert JPEG to BMP
+./filter.exe -b input.jpg output.bmp
+# Chain filters on PNG
+./filter.exe -g -b input.png output.png
+```
+
+## Building and Installation
+
+#### Windows (MSYS2)
+```bash
+# Install dependencies in MSYS2 UCRT64 terminal
+pacman -Syu
+pacman -S mingw-w64-ucrt-x86_64-gcc
+pacman -S mingw-w64-ucrt-x86_64-libpng
+pacman -S mingw-w64-ucrt-x86_64-libjpeg-turbo
+pacman -S make
+```
+
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt-get update
+sudo apt-get install libpng-dev libjpeg-dev build-essential
+```
+
+#### macOS
+```bash
+brew install libpng libjpeg
+```
+
+### Building
+
+```bash
+make clean
+make
+```
 
 You can also chain multiple filters by supplying multiple tags (e.g., `./filter vg input.bmp output.bmp` for vignette then grayscale).
 

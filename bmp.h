@@ -14,7 +14,7 @@
 #endif
 
 // --- Bitmap File Header (14 bytes) ---
-typedef struct
+typedef struct bmp_file_header_struct
 {
     uint16_t bfType;         // File type ("BM")
     uint32_t bfSize;         // Size of the file in bytes
@@ -24,7 +24,7 @@ typedef struct
 } BITMAPFILEHEADER;
 
 // --- Bitmap Info Header (40 bytes for BITMAPINFOHEADER) ---
-typedef struct
+typedef struct bmp_info_header_struct
 {
     uint32_t biSize;            // Header size (40 bytes)
     int32_t  biWidth;           // Image width in pixels
@@ -40,7 +40,7 @@ typedef struct
 } BITMAPINFOHEADER;
 
 // --- RGB Triple (3 bytes per pixel) ---
-typedef struct
+typedef struct bmp_rgb_triple_struct
 {
     uint8_t rgbtBlue;
     uint8_t rgbtGreen;
