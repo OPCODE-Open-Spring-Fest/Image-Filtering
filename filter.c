@@ -3,24 +3,42 @@
 #include <stdlib.h>
 
 #include "helpers.h"
+#include "image_io.h"
 
 int main(int argc, char *argv[])
 {
     // Define allowable filters
     char *filters = "bgrsivtdGoB:";
 
-    
-    char filterArr[argc-3];
+    // Allocate filter array
+    char *filterArr = (char *)malloc((argc - 2) * sizeof(char));
+    if (!filterArr) {
+        printf("Memory allocation error.\n");
+        return 1;
+    }
     int filterCount = 0;
+    int brightness_value = 0;
     
     // gets all filter flags and checks validity
     int opt;
     while ((opt = getopt(argc, argv, filters)) != -1) {
         if (opt == '?') {
             printf("Invalid filter option\n");
+            free(filterArr);
             return 1;
         }
-        filterArr[filterCount++] = opt;
+        if (opt == 'B') {
+            if (optarg) {
+                brightness_value = atoi(optarg);
+            } else {
+                printf("Brightness filter requires a value. Usage: -B <value>\n");
+                free(filterArr);
+                return 1;
+            }
+            filterArr[filterCount++] = opt;
+        } else {
+            filterArr[filterCount++] = opt;
+        }
     }
     
 
@@ -28,6 +46,8 @@ int main(int argc, char *argv[])
     if (argc < optind + 2)
     {
         printf("Usage: ./filter [flag] infile outfile\n");
+        printf("Filters: -g (grayscale), -s (sepia), -r (reflect), -b (blur), -i (invert), -v (vignette), -G (glow), -t (threshold), -d (edge detection), -o (oil paint), -B <value> (brightness)\n");
+        free(filterArr);
         return 3;
     }
 
@@ -35,67 +55,32 @@ int main(int argc, char *argv[])
     char *infile = argv[optind];
     char *outfile = argv[optind + 1];
 
-    // Open input file
-    FILE *inptr = fopen(infile, "rb");
-    if (inptr == NULL)
-    {
-        printf("Could not open %s.\n", infile);
+    // Read image using new I/O system
+    ImageData img;
+    img.pixels = NULL;
+    img.width = 0;
+    img.height = 0;
+    img.format = IMAGE_FORMAT_UNKNOWN;
+    
+    if (read_image(infile, &img) != 0) {
+        printf("Could not read %s. Unsupported file format or file not found.\n", infile);
+        printf("Supported formats: BMP, PNG, JPEG\n");
         return 4;
     }
 
-    // Open output file
-    FILE *outptr = fopen(outfile, "wb");
-    if (outptr == NULL)
-    {
-        fclose(inptr);
-        printf("Could not create %s.\n", outfile);
-        return 5;
+    // Validate image was read correctly
+    if (img.pixels == NULL || img.width <= 0 || img.height <= 0 || img.pixels[0] == NULL) {
+        printf("Error: Invalid image data after reading.\n");
+        free_image(&img);
+        return 4;
     }
 
-    // Read infile's BITMAPFILEHEADER
-    BITMAPFILEHEADER bf;
-    fread(&bf, sizeof(BITMAPFILEHEADER), 1, inptr);
+    int height = img.height;
+    int width = img.width;
+    
+    // Cast pixels to match filter function
 
-    // Read infile's BITMAPINFOHEADER
-    BITMAPINFOHEADER bi;
-    fread(&bi, sizeof(BITMAPINFOHEADER), 1, inptr);
-
-    // Ensure infile is (likely) a 24-bit uncompressed BMP 4.0
-    if (bf.bfType != 0x4d42 || bf.bfOffBits != 54 || bi.biSize != 40 ||
-        bi.biBitCount != 24 || bi.biCompression != 0)
-    {   
-        fclose(outptr);
-        fclose(inptr);
-        printf("Unsupported file format.\n");
-        return 6;
-    }
-
-    // Get image's dimensions
-    int height = abs(bi.biHeight);
-    int width = bi.biWidth;
-
-    // Allocate memory for image
-    RGBTRIPLE(*image)[width] = calloc(height, width * sizeof(RGBTRIPLE));
-    if (image == NULL)
-    {
-        printf("Not enough memory to store image.\n");
-        fclose(outptr);
-        fclose(inptr);
-        return 7;
-    }
-
-    // Determine padding for scanlines
-    int padding = (4 - (width * sizeof(RGBTRIPLE)) % 4) % 4;
-
-    // Iterate over infile's scanlines
-    for (int i = 0; i < height; i++)
-    {
-        // Read row into pixel array
-        fread(image[i], sizeof(RGBTRIPLE), width, inptr);
-
-        // Skip over padding
-        fseek(inptr, padding, SEEK_CUR);
-    }
+    RGBTRIPLE(*image)[width] = (RGBTRIPLE(*)[width])img.pixels[0];
 
     // Filter image
     for(int i=0; i<filterCount; i++){
@@ -152,37 +137,29 @@ int main(int argc, char *argv[])
 
         default:
             printf("Unknown filter: %c\n", filterArr[i]);
-            free(image);
-            fclose(inptr);
-            fclose(outptr);
+            free_image(&img);
+            free(filterArr);
             return 7;
         
     }
     }
-    // Write outfile's BITMAPFILEHEADER
-    fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
-
-    // Write outfile's BITMAPINFOHEADER
-    fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
-
-    // Write new pixels to outfile
-    for (int i = 0; i < height; i++)
-    {
-        // Write row to outfile
-        fwrite(image[i], sizeof(RGBTRIPLE), width, outptr);
-
-        // Write padding at end of row
-        for (int k = 0; k < padding; k++)
-        {
-            fputc(0x00, outptr);
-        }
+    
+    // Free filter array
+    free(filterArr);
+    
+    // Write image using I/O system
+    ImageFormat output_format = get_format_from_extension(outfile);
+    if (output_format == IMAGE_FORMAT_UNKNOWN) {
+        output_format = img.format;  
+    }
+    
+    if (write_image(outfile, &img, output_format) != 0) {
+        printf("Could not write %s.\n", outfile);
+        free_image(&img);
+        return 5;
     }
 
     // Free memory for image
-    free(image);
-
-    // Close files
-    fclose(inptr);
-    fclose(outptr);
+    free_image(&img);
     return 0;
 }
