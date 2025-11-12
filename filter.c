@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtdGoB:";
+    char *filters = "bgrsivtmdGoB:";
 
     
     char filterArr[argc-3];
@@ -15,16 +15,35 @@ int main(int argc, char *argv[])
     
     // gets all filter flags and checks validity
     int opt;
-    while ((opt = getopt(argc, argv, filters)) != -1) {
-        if (opt == '?') {
-            printf("Invalid filter option\n");
-            return 1;
-        }
-        filterArr[filterCount++] = opt;
+    while ((opt = getopt(argc, argv, filters)) != -1)
+{
+    if (opt == '?')
+    {
+        printf("Invalid filter option\n");
+        return 1;
     }
-    
 
-    // Ensure proper usage
+    if (opt == 'm')
+    {
+        printf("\nAvailable filters:\n");
+        printf("  -b   Blur\n");
+        printf("  -g   Grayscale\n");
+        printf("  -r   Reflect\n");
+        printf("  -s   Sepia\n");
+        printf("  -i   Invert\n");
+        printf("  -v   Vignette\n");
+        printf("  -t   Threshold\n");
+        printf("  -d   Detect edges\n");
+        printf("  -B <value>  Adjust brightness\n");
+        printf("  -G   Glow\n");
+        printf("  -o   Oil paint\n");
+        printf("  -m   Show this menu\n\n");
+        return 0;
+    }
+
+    filterArr[filterCount++] = opt;
+}
+
     if (argc < optind + 2)
     {
         printf("Usage: ./filter [flag] infile outfile\n");
