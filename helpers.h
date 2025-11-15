@@ -37,4 +37,6 @@ void vignette(int height, int width, RGBTRIPLE image[height][width]);
 void glow(int height, int width, RGBTRIPLE image[height][width]);
 // Oil Paint filter
 void oilpaint(int height, int width, RGBTRIPLE image[height][width]);
+// Pixelate filter
+void pixelate(int height, int width, RGBTRIPLE image[height][width]);
 #endif
