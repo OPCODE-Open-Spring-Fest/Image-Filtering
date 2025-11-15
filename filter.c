@@ -11,8 +11,15 @@ int main(int argc, char *argv[])
     char *filters = "bgrsivtdGomB:S";
 
     
-    char filterArr[argc-3];
+    /* allocate filter array on heap (was stack-allocated and later freed) */
+    char *filterArr = NULL;
     int filterCount = 0;
+    /* allocate enough space for possible flags; argc is an upper bound */
+    filterArr = malloc(sizeof(char) * (argc > 0 ? argc : 1));
+    if (filterArr == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
     int brightness_value = 0;
     
     // gets all filter flags and checks validity

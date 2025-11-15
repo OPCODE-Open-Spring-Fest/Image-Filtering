@@ -425,6 +425,45 @@ void oilpaint(int height, int width, RGBTRIPLE image[height][width]){
 }
 
 
+// Pixelate (mosaic) filter: average color in blocks
+void pixelate(int height, int width, RGBTRIPLE image[height][width])
+{
+    int block = 10; // block size (pixels)
+    for (int by = 0; by < height; by += block)
+    {
+        for (int bx = 0; bx < width; bx += block)
+        {
+            long sumR = 0, sumG = 0, sumB = 0;
+            int count = 0;
+            for (int y = by; y < by + block && y < height; y++)
+            {
+                for (int x = bx; x < bx + block && x < width; x++)
+                {
+                    sumR += image[y][x].rgbtRed;
+                    sumG += image[y][x].rgbtGreen;
+                    sumB += image[y][x].rgbtBlue;
+                    count++;
+                }
+            }
+            if (count == 0) continue;
+            uint8_t avgR = (uint8_t)(sumR / count);
+            uint8_t avgG = (uint8_t)(sumG / count);
+            uint8_t avgB = (uint8_t)(sumB / count);
+
+            for (int y = by; y < by + block && y < height; y++)
+            {
+                for (int x = bx; x < bx + block && x < width; x++)
+                {
+                    image[y][x].rgbtRed = avgR;
+                    image[y][x].rgbtGreen = avgG;
+                    image[y][x].rgbtBlue = avgB;
+                }
+            }
+        }
+    }
+}
+
+
 void spiral(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE (*output)[width] = calloc(height, width * sizeof(RGBTRIPLE));
@@ -432,32 +471,65 @@ void spiral(int height, int width, RGBTRIPLE image[height][width])
     double cy = height / 2.0;
     double max_r = sqrt(cx * cx + cy * cy);
     double k = 4.0;
-    for (int y=0;y<height;y++)
+
+    for (int y = 0; y < height; y++)
     {
-        for (int x=0;x<width;x++)
+        for (int x = 0; x < width; x++)
         {
-            double dx=x-cx;
-            double dy=y-cy;
-            double r=sqrt(dx*dx+dy*dy);
-            double theta=atan2(dy,dx);
-            double factor=(max_r-r)/max_r;
-            double theta_new=theta+k*factor;
+            double dx = x - cx;
+            double dy = y - cy;
+            double r = sqrt(dx * dx + dy * dy);
+            double theta = atan2(dy, dx);
+            double factor = (max_r - r) / max_r;
+            if (factor < 0.0) factor = 0.0;
+            double theta_new = theta + k * factor;
 
-            double x_new=cx+r*cos(theta_new);
-            double y_new=cy+r*sin(theta_new);
+            double x_new = cx + r * cos(theta_new);
+            double y_new = cy + r * sin(theta_new);
 
-            if (x_new>=0&&x_new<width&&y_new>=0&&y_new<height)
-            {
-                output[y][x]=image[(int)y_new][(int)x_new];
-            }
-            else
-            {
-                output[y][x]=(RGBTRIPLE){0, 0, 0};
-            }
+            /* Clamp coordinates to source image to avoid empty/black pixels */
+            if (x_new < 0.0) x_new = 0.0;
+            if (x_new > (double)(width - 1)) x_new = (double)(width - 1);
+            if (y_new < 0.0) y_new = 0.0;
+            if (y_new > (double)(height - 1)) y_new = (double)(height - 1);
+
+            /* Bilinear interpolation for smooth sampling */
+            int x0 = (int)floor(x_new);
+            int x1 = x0 + 1;
+            if (x1 >= width) x1 = x0;
+            int y0 = (int)floor(y_new);
+            int y1 = y0 + 1;
+            if (y1 >= height) y1 = y0;
+
+            double wx = x_new - x0;
+            double wy = y_new - y0;
+
+            RGBTRIPLE p00 = image[y0][x0];
+            RGBTRIPLE p10 = image[y0][x1];
+            RGBTRIPLE p01 = image[y1][x0];
+            RGBTRIPLE p11 = image[y1][x1];
+
+            double r_val = (1 - wx) * (1 - wy) * p00.rgbtRed
+                         + wx * (1 - wy) * p10.rgbtRed
+                         + (1 - wx) * wy * p01.rgbtRed
+                         + wx * wy * p11.rgbtRed;
+            double g_val = (1 - wx) * (1 - wy) * p00.rgbtGreen
+                         + wx * (1 - wy) * p10.rgbtGreen
+                         + (1 - wx) * wy * p01.rgbtGreen
+                         + wx * wy * p11.rgbtGreen;
+            double b_val = (1 - wx) * (1 - wy) * p00.rgbtBlue
+                         + wx * (1 - wy) * p10.rgbtBlue
+                         + (1 - wx) * wy * p01.rgbtBlue
+                         + wx * wy * p11.rgbtBlue;
+
+            output[y][x].rgbtRed = (uint8_t)round(r_val);
+            output[y][x].rgbtGreen = (uint8_t)round(g_val);
+            output[y][x].rgbtBlue = (uint8_t)round(b_val);
         }
     }
-    for (int y=0;y<height;y++)
-        for (int x=0; x<width; x++)
+
+    for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
             image[y][x] = output[y][x];
 
     free(output);

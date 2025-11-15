@@ -54,11 +54,23 @@ ImageFormat get_format_from_extension(const char *filename) {
     return IMAGE_FORMAT_UNKNOWN;
 }
 extern int read_bmp(const char *filename, ImageData *img);
-extern int read_png(const char *filename, ImageData *img);
-extern int read_jpeg(const char *filename, ImageData *img);
 extern int write_bmp(const char *filename, ImageData *img);
-extern int write_png(const char *filename, ImageData *img);
-extern int write_jpeg(const char *filename, ImageData *img);
+
+/* Fallback stubs for PNG/JPEG handlers when libpng/libjpeg dev headers are not available.
+   These return non-zero to indicate failure; read_image/write_image will report unsupported
+   formats if these are invoked. Keeping them here avoids needing extra files. */
+int read_png(const char *filename, ImageData *img) {
+    (void)filename; (void)img; return 1; /* fail */
+}
+int write_png(const char *filename, ImageData *img) {
+    (void)filename; (void)img; return 1; /* fail */
+}
+int read_jpeg(const char *filename, ImageData *img) {
+    (void)filename; (void)img; return 1; /* fail */
+}
+int write_jpeg(const char *filename, ImageData *img) {
+    (void)filename; (void)img; return 1; /* fail */
+}
 // Read image from file
 int read_image(const char *filename, ImageData *img) {
     if (!filename || !img) {

@@ -43,7 +43,7 @@ Now, open up helpers.c. Here’s where the implementation of the functions decla
 ### Compile
 Paste This in you Terminal(without quotes):
 
-    "gcc -g -std=c11 -Wall -Wextra -Wshadow filter.c helpers.c -o filter -lm"
+       "gcc -g -std=c11 -Wall -Wextra -Wshadow filter.c helpers.c image_io.c bmp_io.c png_io.c jpeg_io.c -o filter -lm"
 
 
 ### Run 
