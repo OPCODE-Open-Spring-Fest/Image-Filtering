@@ -423,3 +423,42 @@ void oilpaint(int height, int width, RGBTRIPLE image[height][width]){
         free(copy[i]);
     free(copy);
 }
+
+// Pixelate filter
+void pixelate(int height, int width, RGBTRIPLE image[height][width]){
+    int blockSize = 8;
+    if (width > 1000 || height > 1000) {
+        blockSize = 16;
+    } else if (width > 500 || height > 500) {
+        blockSize = 12;
+    }
+    for (int blockY = 0; blockY < height; blockY += blockSize){
+        for (int blockX = 0; blockX < width; blockX += blockSize){
+            int blockEndY = min(blockY + blockSize, height);
+            int blockEndX = min(blockX + blockSize, width);
+            
+            long sumRed = 0, sumGreen = 0, sumBlue = 0;
+            int pixelCount = 0;
+            
+            for (int y = blockY; y < blockEndY; y++){
+                for (int x = blockX; x < blockEndX; x++){
+                    sumRed += image[y][x].rgbtRed;
+                    sumGreen += image[y][x].rgbtGreen;
+                    sumBlue += image[y][x].rgbtBlue;
+                    pixelCount++;
+                }
+            }
+            uint8_t avgRed = (uint8_t)(sumRed / pixelCount);
+            uint8_t avgGreen = (uint8_t)(sumGreen / pixelCount);
+            uint8_t avgBlue = (uint8_t)(sumBlue / pixelCount);
+            
+            for (int y = blockY; y < blockEndY; y++){
+                for (int x = blockX; x < blockEndX; x++){
+                    image[y][x].rgbtRed = avgRed;
+                    image[y][x].rgbtGreen = avgGreen;
+                    image[y][x].rgbtBlue = avgBlue;
+                }
+            }
+        }
+    }
+}

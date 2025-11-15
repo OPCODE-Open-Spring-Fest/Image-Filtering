@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtmdGoB:";
+    char *filters = "bgrsivtmdGoPB:";
 
     // Allocate filter array
     char *filterArr = (char *)malloc((argc - 2) * sizeof(char));
@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
             printf("  -B <value>  Adjust brightness\n");
             printf("  -G   Glow\n");
             printf("  -o   Oil paint\n");
+            printf("  -P   Pixelate (mosaic effect)\n");
             printf("  -m   Show this menu\n\n");
             free(filterArr);
             return 0;
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
     if (argc < optind + 2)
     {
         printf("Usage: ./filter [flag] infile outfile\n");
-        printf("Filters: -g (grayscale), -s (sepia), -r (reflect), -b (blur), -i (invert), -v (vignette), -G (glow), -t (threshold), -d (edge detection), -o (oil paint), -B <value> (brightness)\n");
+        printf("Filters: -g (grayscale), -s (sepia), -r (reflect), -b (blur), -i (invert), -v (vignette), -G (glow), -t (threshold), -d (edge detection), -o (oil paint), -P (pixelate), -B <value> (brightness)\n");
         free(filterArr);
         return 3;
     }
@@ -147,6 +148,9 @@ int main(int argc, char *argv[])
             oilpaint(height, width, image);
             break;
 
+        case 'P':  // Pixelate
+            pixelate(height, width, image);
+            break;
         default:
             printf("Unknown filter: %c\n", filterArr[i]);
             free_image(&img);
