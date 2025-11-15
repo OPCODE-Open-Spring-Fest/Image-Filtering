@@ -424,41 +424,41 @@ void oilpaint(int height, int width, RGBTRIPLE image[height][width]){
     free(copy);
 }
 
-// Pixelate filter
-void pixelate(int height, int width, RGBTRIPLE image[height][width]){
-    int blockSize = 8;
-    if (width > 1000 || height > 1000) {
-        blockSize = 16;
-    } else if (width > 500 || height > 500) {
-        blockSize = 12;
-    }
-    for (int blockY = 0; blockY < height; blockY += blockSize){
-        for (int blockX = 0; blockX < width; blockX += blockSize){
-            int blockEndY = min(blockY + blockSize, height);
-            int blockEndX = min(blockX + blockSize, width);
-            
-            long sumRed = 0, sumGreen = 0, sumBlue = 0;
-            int pixelCount = 0;
-            
-            for (int y = blockY; y < blockEndY; y++){
-                for (int x = blockX; x < blockEndX; x++){
-                    sumRed += image[y][x].rgbtRed;
-                    sumGreen += image[y][x].rgbtGreen;
-                    sumBlue += image[y][x].rgbtBlue;
-                    pixelCount++;
-                }
+
+void spiral(int height, int width, RGBTRIPLE image[height][width])
+{
+    RGBTRIPLE (*output)[width] = calloc(height, width * sizeof(RGBTRIPLE));
+    double cx = width / 2.0;
+    double cy = height / 2.0;
+    double max_r = sqrt(cx * cx + cy * cy);
+    double k = 4.0;
+    for (int y=0;y<height;y++)
+    {
+        for (int x=0;x<width;x++)
+        {
+            double dx=x-cx;
+            double dy=y-cy;
+            double r=sqrt(dx*dx+dy*dy);
+            double theta=atan2(dy,dx);
+            double factor=(max_r-r)/max_r;
+            double theta_new=theta+k*factor;
+
+            double x_new=cx+r*cos(theta_new);
+            double y_new=cy+r*sin(theta_new);
+
+            if (x_new>=0&&x_new<width&&y_new>=0&&y_new<height)
+            {
+                output[y][x]=image[(int)y_new][(int)x_new];
             }
-            uint8_t avgRed = (uint8_t)(sumRed / pixelCount);
-            uint8_t avgGreen = (uint8_t)(sumGreen / pixelCount);
-            uint8_t avgBlue = (uint8_t)(sumBlue / pixelCount);
-            
-            for (int y = blockY; y < blockEndY; y++){
-                for (int x = blockX; x < blockEndX; x++){
-                    image[y][x].rgbtRed = avgRed;
-                    image[y][x].rgbtGreen = avgGreen;
-                    image[y][x].rgbtBlue = avgBlue;
-                }
+            else
+            {
+                output[y][x]=(RGBTRIPLE){0, 0, 0};
             }
         }
     }
+    for (int y=0;y<height;y++)
+        for (int x=0; x<width; x++)
+            image[y][x] = output[y][x];
+
+    free(output);
 }

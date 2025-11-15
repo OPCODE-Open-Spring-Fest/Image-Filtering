@@ -8,14 +8,10 @@
 int main(int argc, char *argv[])
 {
     // Define allowable filters
-    char *filters = "bgrsivtmdGoPB:";
+    char *filters = "bgrsivtdGomB:S";
 
-    // Allocate filter array
-    char *filterArr = (char *)malloc((argc - 2) * sizeof(char));
-    if (!filterArr) {
-        printf("Memory allocation error.\n");
-        return 1;
-    }
+    
+    char filterArr[argc-3];
     int filterCount = 0;
     int brightness_value = 0;
     
@@ -147,7 +143,9 @@ int main(int argc, char *argv[])
         case 'o':
             oilpaint(height, width, image);
             break;
-
+        case 'S':
+            spiral(height, width, image);
+            break;
         case 'P':  // Pixelate
             pixelate(height, width, image);
             break;
