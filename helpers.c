@@ -424,7 +424,7 @@ void oilpaint(int height, int width, RGBTRIPLE image[height][width]){
     free(copy);
 }
 
-// Pixelate filte
+// Pixelate filter
 void pixelate(int height, int width, RGBTRIPLE image[height][width]){
     int blockSize = 8;
     if (width > 1000 || height > 1000) {
